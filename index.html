@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Marker Based AR - Poprawiona Kamera</title>
+    <title>Marker Based AR - Naprawa Kamery</title>
     <!-- Dołączenie A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <!-- Dołączenie AR.js dla A-Frame -->
@@ -15,72 +15,48 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            background-color: #000;
         }
-    </style>
-</head>
-<body style="margin: 0; overflow: hidden;">
-
-    <!-- Uproszczona konfiguracja arjs dla lepszej kompatybilności -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; <!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Marker Based AR - Poprawiona Kamera</title>
-    <!-- Dołączenie A-Frame -->
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Dołączenie AR.js dla A-Frame -->
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <style>
-        /* Wymuszenie pełnego ekranu i reset stylów, żeby wideo nie wyskakiwało poza ramki */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-        /* Naprawa problemu z pozycjonowaniem kontenera wideo przez AR.js */
+        /* Kontrola nad wideo */
         #arjs-video {
             width: 100% !important;
             height: 100% !important;
-            margin-left: 0 !important;
-            margin-top: 0 !important;
-            object-fit: cover !important;
+            object-fit: cover !important; /* Powrót do cover, ale z wymuszonymi parametrami w arjs */
+            margin: 0 !important;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Zmiany w arjs: dodane videoTexture: true oraz dopasowanie sourceWidth/Height -->
+    <!-- Stabilna konfiguracja z wymuszeniem tylnej kamery (facingMode) -->
     <a-scene embedded 
              arjs="sourceType: webcam; 
-                   debugUIEnabled: false; 
-                   sourceWidth: 1280; 
-                   sourceHeight: 960; 
-                   displayWidth: 1280; 
-                   displayHeight: 960; 
-                   videoTexture: true;">
+                   sourceWidth: 640; 
+                   sourceHeight: 480; 
+                   displayWidth: 640; 
+                   displayHeight: 480;
+                   sourceParameters: { facingMode: 'environment' };
+                   debugUIEnabled: false;">
         
-        <!-- Ładowanie zasobów (Rzeźba GLB) -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Definicja Twojego markera .patt -->
-        <a-marker type="pattern" url="pattern-qr-code (8).patt">
-            
-            <!-- Model rzeźby -->
+        <a-marker type="pattern" url="marker.patt">
             <a-entity 
                 gltf-model="#sculpture" 
-                scale="1 1 1" 
+                scale="0.5 0.5 0.5" 
                 position="0 0 0"
                 rotation="0 0 0">
             </a-entity>
-            
         </a-marker>
 
-        <!-- Kamera AR -->
+        <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
+        <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
+
         <a-entity camera></a-entity>
 
     </a-scene>
