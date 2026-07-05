@@ -55,6 +55,42 @@
         <a-entity camera="active: true;" look-controls="enabled: false"></a-entity>
 
     </a-scene>
+  <script>
+        document.body.addEventListener('click', function() {
+            // Szukamy elementu <video>, który AR.js automatycznie tworzy dla kamery
+            const video = document.querySelector('video');
+            
+            if (video && video.srcObject) {
+                const videoTrack = video.srcObject.getVideoTracks()[0];
+                
+                if (videoTrack && typeof videoTrack.getCapabilities === 'function') {
+                    const capabilities = videoTrack.getCapabilities();
+                    
+                    // Sprawdzamy, czy przeglądarka i telefon wspierają kontrolę focusu
+                    if (capabilities.focusMode) {
+                        const currentConstraints = videoTrack.getConstraints();
+                        
+                        // Krok 1: Wymuszamy tryb ręczny (lub ciągły), aby zresetować focus
+                        videoTrack.applyConstraints({
+                            advanced: [{ focusMode: 'single-shot' }]
+                        }).then(() => {
+                            // Krok 2: Po krótkiej chwili wracamy do trybu ciągłego (continuous)
+                            setTimeout(() => {
+                                videoTrack.applyConstraints({
+                                    advanced: [{ focusMode: 'continuous' }]
+                                });
+                            }, 500);
+                        }).catch(err => console.log("Focus error:", err));
+                    }
+                } else {
+                    // Alternatywny "brutalny" trik dla starszych urządzeń/iOS:
+                    // Szybkie pauzowanie i wznawianie wideo często zmusza system do ponownego złapania ostrości
+                    video.pause();
+                    setTimeout(() => { video.play(); }, 100);
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>
