@@ -17,81 +17,44 @@
             overflow: hidden;
         }
     </style>
-
-    <script>
-        // Rejestracja brakującego komponentu stabilizacji poszukiwanego przez marker
-        AFRAME.registerComponent('stabilize-model', {
-            schema: {
-                target: { type: 'selector' }, // ID kontenera rzeźby
-                lerpFactor: { type: 'number', default: 0.15 } // Im mniejsza wartość, tym płynniejszy ruch, ale większe opóźnienie
-            },
-            init: function () {
-                this.markerVisible = false;
-                this.targetElement = this.data.target;
-
-                // Reakcja na znalezienie markera
-                this.el.addEventListener('markerFound', () => {
-                    this.markerVisible = true;
-                    if (this.targetElement) this.targetElement.setAttribute('visible', true);
-                });
-
-                // Reakcja na zgubienie markera
-                this.el.addEventListener('markerLost', () => {
-                    this.markerVisible = false;
-                    // Możesz opcjonalnie ukryć model od razu lub pozwolić mu zostać w ostatniej pozycji:
-                    // if (this.targetElement) this.targetElement.setAttribute('visible', false);
-                });
-            },
-            tick: function (time, timeDelta) {
-                // Jeśli marker jest widoczny, płynnie (LERP) kopiujemy jego pozycję i rotację do zewnętrznego kontenera
-                if (this.markerVisible && this.targetElement) {
-                    const markerPos = this.el.object3D.position;
-                    const markerRot = this.el.object3D.quaternion;
-
-                    // Płynna interpolacja pozycji
-                    this.targetElement.object3D.position.lerp(markerPos, this.data.lerpFactor);
-                    
-                    // Płynna interpolacja rotacji
-                    this.targetElement.object3D.quaternion.slerp(markerRot, this.data.lerpFactor);
-                }
-            }
-        });
-    </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Podbita rozdzielczość kamery dla lepszej detekcji i zredukowania szumów -->
+    <!-- arjs tuning: podbita rozdzielczość oraz wyłączona emulacja ułatwiają precyzyjne śledzenie -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
         
         <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Fizyczny marker służy TERAZ TYLKO jako punkt odniesienia -->
-        <!-- Poprawnie domknięty znacznik oraz dodany komponent stabilizacji powiązany z kontenerem -->
-        <a-marker type="pattern" url="marker.patt" stabilize-model="target: #sculpture-container; lerpFactor: 0.2">
-        </a-marker>
-
-        <!-- Kontener rzeźby umieszczony bezpośrednio w scenie (nie wewnątrz markera) -->
-        <!-- Skrypt steruje jego widocznością i pozycją -->
-        <a-entity id="sculpture-container" visible="false">
+        <!-- Poniższe parametry 'smooth' aktywują wewnętrzne filtry AR.js redukujące szum -->
+        <a-marker 
+            type="pattern" 
+            url="marker.patt"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
+            
+            <!-- Model umieszczony bezpośrednio w markerze gwarantuje, że skala pozostanie nienaruszona -->
             <a-entity 
                 gltf-model="#sculpture" 
                 scale="0.5 0.5 0.5" 
                 position="0 0.1 0"
                 rotation="0 0 0">
             </a-entity>
-        </a-entity>
+
+        </a-marker>
 
         <!-- Światła -->
         <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
         <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
 
-        <!-- Kamera z całkowicie zablokowanym sterowaniem A-Frame -->
-        <a-entity camera look-controls="enabled: false"></a-entity>
+        <!-- Kamera systemu AR.js -->
+        <a-entity camera></a-entity>
 
     </a-scene>
 
