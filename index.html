@@ -4,42 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Marker Based AR - Maksymalna Stabilizacja</title>
-    <!-- Dołączenie A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Dołączenie AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
     </style>
+    
+    <script>
+        // Komponent odpowiedzialny za płynne kopiowanie pozycji z markera do modelu
+        AFRAME.registerComponent('stabilize-model', {
+            init: function () {
+                this.modelContainer = document.querySelector('#sculpture-container');
+                
+                // Kiedy marker zostanie wykryty
+                this.el.addEventListener('markerFound', () => {
+                    this.modelContainer.setAttribute('visible', 'true');
+                });
 
-
+                // Kiedy marker zniknie z pola widzenia
+                this.el.addEventListener('markerLost', () => {
+                    // Opcjonalnie: ukryj lub zostaw model w ostatniej pozycji (tu: ukrywamy)
+                    this.modelContainer.setAttribute('visible', 'false');
+                });
+            },
+            tick: function () {
+                // Jeśli marker jest widoczny, płynnie interpoluj (LERP) pozycję i rotację
+                if (this.el.object3D.visible && this.modelContainer) {
+                    // Płynne przejście pozycji (0.2 to szybkość reakcji - im mniejsza, tym stabilniej)
+                    this.modelContainer.object3D.position.lerp(this.el.object3D.position, 0.2);
+                    this.modelContainer.object3D.quaternion.slerp(this.el.object3D.quaternion, 0.2);
+                }
+            }
+        });
+    </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Podbita rozdzielczość kamery dla lepszej detekcji i zredukowania szumów -->
     <a-scene 
         embedded 
         arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
         
-        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Fizyczny marker służy TERAZ TYLKO jako punkt odniesienia (nie zawiera w sobie modelu) -->
-        <!-- Przypisaliśmy do niego nasz nowy komponent 'stabilize-model' -->
-        <a-marker type="pattern" url="marker.patt" >
-            <!-- Pozostawiamy pusty lub z niewidocznym punktem pomocniczym -->
-       
+        <!-- Marker z przypisanym nowym komponentem stabilizującym -->
+        <a-marker type="pattern" url="marker.patt" stabilize-model>
+        </a-marker>
 
-        <!-- Kontener rzeźby umieszczony bezpośrednio w scenie (nie wewnątrz markera) -->
-        <!-- Dzięki temu skrypt JavaScript może płynnie nim sterować bez zakłóceń ze strony silnika AR.js -->
+        <!-- Kontener rzeźby na poziomie sceny (sterowany przez JS) -->
         <a-entity id="sculpture-container" visible="false">
             <a-entity 
                 gltf-model="#sculpture" 
@@ -53,12 +66,11 @@
         <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
         <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
 
-        <!-- Kamera z całkowicie zablokowanym sterowaniem A-Frame -->
+        <!-- Kamera -->
         <a-entity camera look-controls="enabled: false"></a-entity>
- </a-marker>
     </a-scene>
 
-    <!-- Skrypt Focusu (Tap to focus przy kliknięciu ekranu) -->
+    <!-- Skrypt Focusu -->
     <script>
         document.body.addEventListener('click', function() {
             const video = document.querySelector('video');
@@ -80,6 +92,5 @@
             }
         });
     </script>
-
 </body>
 </html>
