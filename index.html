@@ -18,14 +18,40 @@
         }
     </style>
 
+    <script>
+        // REWOLUCYJNY KOMPONENT STABILIZUJĄCY (LERP SMOOTHING)
+        // Pobiera pozycję z zaszumionego markera i płynnie aplikuje ją do modelu rzeźby
+        AFRAME.registerComponent('stabilize-model', {
+            init: function () {
+                this.target = document.querySelector('#sculpture-container');
+                this.marker = this.el;
+            },
+            tick: function () {
+                // Jeśli marker jest widoczny w kamerze
+                if (this.marker.object3D.visible) {
+                    this.target.setAttribute('visible', 'true');
 
+                    // Płynne wyrównanie pozycji (Lerp)
+                    // Wartość 0.15 oznacza, że model pokonuje 15% dystansu do markera na klatkę.
+                    // Zmniejsz do 0.05, jeśli chcesz jeszcze większej stabilizacji (ale model będzie minimalnie "pływał" za markerem)
+                    this.target.object3D.position.lerp(this.marker.object3D.position, 0.15);
+                    
+                    // Płynne wyrównanie rotacji
+                    this.target.object3D.quaternion.slerp(this.marker.object3D.quaternion, 0.15);
+                } else {
+                    // Opcjonalnie ukryj model, gdy zgubimy marker
+                    this.target.setAttribute('visible', 'false');
+                }
+            }
+        });
+    </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
     <!-- Podbita rozdzielczość kamery dla lepszej detekcji i zredukowania szumów -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
         
         <!-- Ładowanie zasobów -->
         <a-assets>
