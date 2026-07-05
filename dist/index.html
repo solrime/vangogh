@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Marker Based AR - Poprawiona Kamera</title>
-    <!-- Dołączenie A-Frame -->
+    <!-- Dołączenie stabilnej wersji A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Dołączenie AR.js dla A-Frame -->
+    <!-- Dołączenie oficjalnej i stabilnej ścieżki AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        /* Wymuszenie pełnego ekranu i reset stylów, żeby wideo nie wyskakiwało poza ramki */
         body, html {
             margin: 0;
             padding: 0;
@@ -17,47 +16,35 @@
             height: 100%;
             overflow: hidden;
         }
-        /* Naprawa problemu z pozycjonowaniem kontenera wideo przez AR.js */
-        #arjs-video {
-            width: 100% !important;
-            height: 100% !important;
-            margin-left: 0 !important;
-            margin-top: 0 !important;
-            object-fit: cover !important;
-        }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Zmiany w arjs: dodane videoTexture: true oraz dopasowanie sourceWidth/Height -->
-    <a-scene embedded 
-             arjs="sourceType: webcam; 
-                   debugUIEnabled: false; 
-                   sourceWidth: 1280; 
-                   sourceHeight: 960; 
-                   displayWidth: 1280; 
-                   displayHeight: 960; 
-                   videoTexture: true;">
+    <!-- Usunięto sztywne wymiary i videoTexture, które często powodują błędy w nakładaniu obiektów 3D -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         
-        <!-- Ładowanie zasobów (Rzeźba GLB) -->
         <a-assets>
+            <!-- Zewnętrzny model GLB -->
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Definicja Twojego markera .patt -->
+        <!-- Definicja markera (upewnij się, że ścieżka do marker.patt jest poprawna) -->
         <a-marker type="pattern" url="marker.patt">
             
-            <!-- Model rzeźby -->
+            <!-- Dodano testowy czerwony boks, aby sprawdzić czy sam marker w ogóle działa -->
+            <a-box position="0 0.5 0" material="color: red; opacity: 0.5;" scale="0.2 0.2 0.2"></a-box>
+
+            <!-- Model rzeźby: Zwiększono skalę i lekko podniesiono pozycję (o 0.5 w górę na osi Y) -->
             <a-entity 
                 gltf-model="#sculpture" 
-                scale="1 1 1" 
-                position="0 0 0"
+                scale="5 5 5" 
+                position="0 0.5 0"
                 rotation="0 0 0">
             </a-entity>
             
         </a-marker>
 
-        <!-- Kamera AR -->
+        <!-- Kamera z domyślnym dla AR.js znacznikiem -->
         <a-entity camera></a-entity>
 
     </a-scene>
