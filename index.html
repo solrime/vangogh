@@ -39,12 +39,17 @@
   </head>
 
   <body>
+    <a-assets>
+            <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
+        </a-assets>
     <a-scene embedded arjs="patternRatio: 0.80">
       <a-marker type="pattern" url="/home/project/public/marker.patt">
-
-        <!-- Główna rzeźba (oko) - patrzy na kamerę -->
-
-        ></a-entity>
+<a-entity 
+                gltf-model="#sculpture" 
+                scale="0.5 0.5 0.5" 
+                position="0 0.1 0"
+                rotation="0 0 0">
+            </a-entity>
 
       </a-marker>
 
