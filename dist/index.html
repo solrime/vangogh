@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <title>Marker Based AR - Maksymalna Stabilizacja</title>
+    <title>AR.js Debug - Test Kostki</title>
     <!-- Dołączenie A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <!-- Dołączenie AR.js dla A-Frame -->
@@ -20,17 +20,14 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- arjs tuning: podbita rozdzielczość oraz wyłączona emulacja ułatwiają precyzyjne śledzenie -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
         
-        <!-- Ładowanie zasobów -->
-        <a-assets>
-            <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
-        </a-assets>
+        <!-- Pusty kontener na zasoby, bo na razie nic nie ładujemy z zewnątrz -->
+        <a-assets></a-assets>
 
-        <!-- Poniższe parametry 'smooth' aktywują wewnętrzne filtry AR.js redukujące szum -->
+        <!-- Marker z aktywnym filtrowaniem drgań (smooth) -->
         <a-marker 
             type="pattern" 
             url="marker.patt"
@@ -39,26 +36,26 @@
             smoothTolerance="0.01"
             smoothThreshold="5">
             
-            <!-- Model umieszczony bezpośrednio w markerze gwarantuje, że skala pozostanie nienaruszona -->
-            <a-entity 
-                gltf-model="#sculpture" 
-                scale="1 1 1" 
-                position="0 0.1 0"
-                rotation="0 0 0">
-            </a-entity>
+            <!-- Prosty, testowy sześcian o boku 1 metra (w skali AR) -->
+            <!-- Pozycja Y: 0.5 unosi go idealnie na powierzchnię markera (bo środek ciężkości boxa jest w jego centrum) -->
+            <a-box 
+                position="0 0.5 0" 
+                material="color: #FF0055; opacity: 0.8;"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+            </a-box>
 
         </a-marker>
 
-        <!-- Światła -->
-        <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
-        <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
+        <!-- Podstawowe oświetlenie sceny -->
+        <a-entity light="type: ambient; color: #FFF; intensity: 1.0"></a-entity>
+        <a-entity light="type: directional; color: #FFF; intensity: 1.0" position="-1 2 1"></a-entity>
 
-        <!-- Kamera systemu AR.js -->
+        <!-- Kamera AR.js -->
         <a-entity camera></a-entity>
 
     </a-scene>
 
-    <!-- Skrypt Focusu (Tap to focus przy kliknięciu ekranu) -->
+    <!-- Skrypt Tap to focus -->
     <script>
         document.body.addEventListener('click', function() {
             const video = document.querySelector('video');
