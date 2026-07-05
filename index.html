@@ -22,7 +22,7 @@
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
+        arjs="sourceType: webcam; ">
         
         <!-- Pusty kontener na zasoby, bo na razie nic nie ładujemy z zewnątrz -->
         <a-assets></a-assets>
@@ -46,37 +46,12 @@
 
         </a-marker>
 
-        <!-- Podstawowe oświetlenie sceny -->
-        <a-entity light="type: ambient; color: #FFF; intensity: 1.0"></a-entity>
-        <a-entity light="type: directional; color: #FFF; intensity: 1.0" position="-1 2 1"></a-entity>
 
         <!-- Kamera AR.js -->
         <a-entity camera></a-entity>
 
     </a-scene>
 
-    <!-- Skrypt Tap to focus -->
-    <script>
-        document.body.addEventListener('click', function() {
-            const video = document.querySelector('video');
-            if (video && video.srcObject) {
-                const videoTrack = video.srcObject.getVideoTracks()[0];
-                if (videoTrack && typeof videoTrack.getCapabilities === 'function') {
-                    const capabilities = videoTrack.getCapabilities();
-                    if (capabilities.focusMode) {
-                        videoTrack.applyConstraints({ advanced: [{ focusMode: 'single-shot' }] }).then(() => {
-                            setTimeout(() => {
-                                videoTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
-                            }, 500);
-                        }).catch(err => console.log(err));
-                    }
-                } else {
-                    video.pause();
-                    setTimeout(() => { video.play(); }, 100);
-                }
-            }
-        });
-    </script>
-
+   
 </body>
 </html>
