@@ -20,33 +20,39 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Dodano smooth: false oraz zmodyfikowano parametry śledzenia -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best;">
+    <!-- Konfiguracja arjs -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
         
         <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Wyłączenie wygładzania (smooth: false) blokuje model idealnie na pozycji markera -->
-        <a-marker type="pattern" url="marker.patt" smooth="false">
+        <!-- DODANO: Wygładzanie pozycji (smooth, smoothCount, smoothTolerance) -->
+        <a-marker 
+            type="pattern" 
+            url="marker.patt"
+            smooth="true"
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
             
             <!-- Model rzeźby -->
             <a-entity 
                 gltf-model="#sculpture" 
                 scale="0.5 0.5 0.5" 
-                position="0 0.5 0"
+                position="0 0 0"
                 rotation="0 0 0">
             </a-entity>
             
         </a-marker>
 
-        <!-- Dodanie światła, aby model nie był czarny -->
+        <!-- Światła -->
         <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
         <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
 
-        <!-- Kamera AR -->
-        <a-entity camera></a-entity>
+        <!-- ZMIENIONO: Kamera z wyłączonym sterowaniem myszą/ruchem, aby nie "odklejać" sceny -->
+        <a-entity camera="active: true;" look-controls="enabled: false"></a-entity>
 
     </a-scene>
 
