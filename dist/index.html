@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Marker Based AR - Maksymalna Stabilizacja</title>
+    <!-- Dołączenie A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- Dołączenie AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
         body, html {
@@ -13,157 +15,70 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: black;
         }
     </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
+    <!-- arjs tuning: podbita rozdzielczość oraz wyłączona emulacja ułatwiają precyzyjne śledzenie -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720; trackingMethod: best;">
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
         
+        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Marker z dodatkowymi parametrami stabilizacji -->
+        <!-- Poniższe parametry 'smooth' aktywują wewnętrzne filtry AR.js redukujące szum -->
         <a-marker 
             type="pattern" 
             url="marker.patt"
             smooth="true"
-            smoothCount="15"
-            smoothTolerance="0.005"
-            smoothThreshold="3"
-            preset="custom"
-            size="1">
+            smoothCount="10"
+            smoothTolerance="0.01"
+            smoothThreshold="5">
             
-            <!-- Model z dodatkowym opóźnieniem i stabilizacją pozycji -->
+            <!-- Model umieszczony bezpośrednio w markerze gwarantuje, że skala pozostanie nienaruszona -->
             <a-entity 
                 gltf-model="#sculpture" 
                 scale="0.5 0.5 0.5" 
                 position="0 0.1 0"
-                rotation="0 0 0"
-                animation="property: position; to: 0 0.1 0; dur: 100; easing: linear; loop: false"
-                animation__scale="property: scale; to: 0.5 0.5 0.5; dur: 100; easing: linear; loop: false"
-                animation__rotation="property: rotation; to: 0 0 0; dur: 100; easing: linear; loop: false">
+                rotation="0 0 0">
             </a-entity>
 
         </a-marker>
 
-        <!-- Oświetlenie -->
-        <a-entity light="type: ambient; color: #FFF; intensity: 2"></a-entity>
-        <a-entity light="type: directional; color: #FFF; intensity: 1.5" position="-1 2 1"></a-entity>
-        <a-entity light="type: directional; color: #FFF; intensity: 0.5" position="1 -1 1"></a-entity>
+        <!-- Światła -->
+        <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
+        <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
 
+        <!-- Kamera systemu AR.js -->
         <a-entity camera></a-entity>
 
     </a-scene>
 
+    <!-- Skrypt Focusu (Tap to focus przy kliknięciu ekranu) -->
     <script>
-        // 1. Poprawione zarządzanie ostrością z większą stabilnością
-        let focusLock = false;
         document.body.addEventListener('click', function() {
-            if (focusLock) return;
-            focusLock = true;
-            
             const video = document.querySelector('video');
             if (video && video.srcObject) {
                 const videoTrack = video.srcObject.getVideoTracks()[0];
                 if (videoTrack && typeof videoTrack.getCapabilities === 'function') {
                     const capabilities = videoTrack.getCapabilities();
-                    if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
-                        videoTrack.applyConstraints({ 
-                            advanced: [{ focusMode: 'single-shot' }] 
-                        }).then(() => {
+                    if (capabilities.focusMode) {
+                        videoTrack.applyConstraints({ advanced: [{ focusMode: 'single-shot' }] }).then(() => {
                             setTimeout(() => {
-                                videoTrack.applyConstraints({ 
-                                    advanced: [{ focusMode: 'continuous' }] 
-                                });
-                                setTimeout(() => { focusLock = false; }, 100);
-                            }, 300);
-                        }).catch(() => { focusLock = false; });
-                    } else {
-                        // Fallback dla urządzeń bez autofocus
-                        video.pause();
-                        setTimeout(() => { 
-                            video.play();
-                            focusLock = false;
-                        }, 200);
+                                videoTrack.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+                            }, 500);
+                        }).catch(err => console.log(err));
                     }
                 } else {
-                    focusLock = false;
-                }
-            } else {
-                focusLock = false;
-            }
-        });
-
-        // 2. Dodatkowe skrypty stabilizujące dla AR.js
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ponowne ładowanie markera po wykryciu problemów
-            const scene = document.querySelector('a-scene');
-            if (scene) {
-                scene.addEventListener('arjs-error', function(ev) {
-                    console.warn('AR.js error, restarting...', ev.detail);
-                    setTimeout(() => {
-                        const marker = document.querySelector('a-marker');
-                        if (marker) {
-                            marker.setAttribute('visible', false);
-                            setTimeout(() => {
-                                marker.setAttribute('visible', true);
-                            }, 100);
-                        }
-                    }, 500);
-                });
-            }
-        });
-
-        // 3. Zabezpieczenie przed zmianą skali modelu
-        let lastScale = 0.5;
-        let lastPos = {x: 0, y: 0.1, z: 0};
-        
-        // Obserwator zmian dla modelu
-        const observer = new MutationObserver(function(mutations) {
-            const model = document.querySelector('a-entity[gltf-model]');
-            if (model) {
-                // Sprawdzanie skali
-                const currentScale = model.getAttribute('scale');
-                if (currentScale && (Math.abs(currentScale.x - lastScale) > 0.05 || 
-                                     Math.abs(currentScale.y - lastScale) > 0.05 || 
-                                     Math.abs(currentScale.z - lastScale) > 0.05)) {
-                    // Przywracanie prawidłowej skali
-                    model.setAttribute('scale', {x: lastScale, y: lastScale, z: lastScale});
-                }
-                
-                // Sprawdzanie pozycji
-                const currentPos = model.getAttribute('position');
-                if (currentPos && (Math.abs(currentPos.x - lastPos.x) > 0.05 || 
-                                   Math.abs(currentPos.y - lastPos.y) > 0.05 || 
-                                   Math.abs(currentPos.z - lastPos.z) > 0.05)) {
-                    // Przywracanie prawidłowej pozycji
-                    model.setAttribute('position', lastPos);
+                    video.pause();
+                    setTimeout(() => { video.play(); }, 100);
                 }
             }
         });
-        
-        // Uruchomienie obserwatora po załadowaniu
-        setTimeout(() => {
-            const model = document.querySelector('a-entity[gltf-model]');
-            if (model) {
-                observer.observe(model, { 
-                    attributes: true, 
-                    attributeFilter: ['scale', 'position'] 
-                });
-            }
-        }, 1000);
-
-        // 4. Czyszczenie pamięci co minutę dla lepszej stabilności
-        setInterval(() => {
-            if (window.gc) {
-                window.gc();
-            }
-        }, 60000);
     </script>
 
 </body>
