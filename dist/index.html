@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Marker Based AR - Maksymalna Stabilizacja</title>
-    <!-- Dołączenie A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Dołączenie AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
         body, html {
@@ -20,46 +18,76 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- arjs tuning: podbita rozdzielczość oraz wyłączona emulacja ułatwiają precyzyjne śledzenie -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;">
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; 
+              sourceWidth:1280; sourceHeight:720; displayWidth: 1280; displayHeight: 720;
+              trackingMethod: best;">
         
-        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Poniższe parametry 'smooth' aktywują wewnętrzne filtry AR.js redukujące szum -->
+        <!-- KLUCZOWA ZMIANA: Dodanie parametrów preserveScale i rotation -->
         <a-marker 
             type="pattern" 
             url="marker.patt"
             smooth="true"
-            smoothCount="10"
-            smoothTolerance="0.01"
-            smoothThreshold="5">
+            smoothCount="15"
+            smoothTolerance="0.001"
+            smoothThreshold="3"
+            preserveScale="true"
+            rotation="0 0 0">
             
-            <!-- Model umieszczony bezpośrednio w markerze gwarantuje, że skala pozostanie nienaruszona -->
+            <!-- KLUCZOWA ZMIANA: Użycie a-entity z dodatkowymi zabezpieczeniami -->
             <a-entity 
                 gltf-model="#sculpture" 
                 scale="0.5 0.5 0.5" 
                 position="0 0.1 0"
-                rotation="0 0 0">
+                rotation="0 0 0"
+                animation__scale="property: scale; to: 0.5 0.5 0.5; dur: 1; loop: false"
+                animation__position="property: position; to: 0 0.1 0; dur: 1; loop: false">
             </a-entity>
 
         </a-marker>
 
-        <!-- Światła -->
         <a-entity light="type: ambient; color: #FFF; intensity: 1.5"></a-entity>
         <a-entity light="type: directional; color: #FFF; intensity: 1" position="-1 2 1"></a-entity>
-
-        <!-- Kamera systemu AR.js -->
         <a-entity camera></a-entity>
 
     </a-scene>
 
-    <!-- Skrypt Focusu (Tap to focus przy kliknięciu ekranu) -->
     <script>
+        // Wymuszenie stałej skali co klatkę (dodatkowe zabezpieczenie)
+        document.addEventListener('DOMContentLoaded', function() {
+            const scene = document.querySelector('a-scene');
+            
+            scene.addEventListener('tick', function() {
+                const marker = document.querySelector('a-marker');
+                if (marker && marker.object3D) {
+                    // Sprawdzamy czy marker jest widoczny
+                    if (marker.object3D.visible) {
+                        const model = marker.querySelector('a-entity[gltf-model]');
+                        if (model) {
+                            // Wymuszamy stałą skalę i pozycję
+                            const targetScale = {x: 0.5, y: 0.5, z: 0.5};
+                            const targetPos = {x: 0, y: 0.1, z: 0};
+                            
+                            // Jeśli skala odbiega od docelowej - natychmiast popraw
+                            if (Math.abs(model.object3D.scale.x - targetScale.x) > 0.001) {
+                                model.object3D.scale.set(targetScale.x, targetScale.y, targetScale.z);
+                            }
+                            
+                            if (Math.abs(model.object3D.position.y - targetPos.y) > 0.001) {
+                                model.object3D.position.set(targetPos.x, targetPos.y, targetPos.z);
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Focus przy kliknięciu
         document.body.addEventListener('click', function() {
             const video = document.querySelector('video');
             if (video && video.srcObject) {
@@ -73,9 +101,6 @@
                             }, 500);
                         }).catch(err => console.log(err));
                     }
-                } else {
-                    video.pause();
-                    setTimeout(() => { video.play(); }, 100);
                 }
             }
         });
