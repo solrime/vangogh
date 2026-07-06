@@ -11,24 +11,24 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Scena AR -->
-<a-scene 
-    embedded 
-    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; imageSmoothingEnabled: true; trackingMethod: best;"
-    gesture-detector>
+    <!-- Scena AR zoptymalizowana pod kątem stabilności -->
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; imageSmoothingEnabled: true; trackingMethod: best; smooth: true; smoothCount: 10; smoothTolerance: 0.01; smoothThreshold: 5;">
         
         <!-- Zarządzanie zasobami (ładowanie modelu 3D) -->
         <a-assets>
             <a-asset-item id="sculpture-model" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Definicja Twojego markera -->
-        <!-- Plik 'marker.patt' musi być w tym samym folderze co ten plik HTML -->
+        <!-- Definicja Twojego markera typu 'pattern' -->
         <a-marker type="pattern" url="marker.patt">
             
-            <!-- Twój model 3D nałożony na marker -->
-            <!-- Skala (scale) i pozycja (position) mogą wymagać korekty w zależności od wielkości oryginalnego modelu -->
-            <a-box position="0 0.1 0" rotation="0 45 45" color="#4CC3D9"></a-box>
+            <!-- Kostka testowa -->
+            <a-box position="0 0.5 0" rotation="0 45 45" color="#4CC3D9" scale="0.5 0.5 0.5"></a-box>
+
+            <!-- Aby użyć swojego modelu GLTF zamiast kostki, odkomentuj linię poniżej: -->
+            <!-- <a-entity gltf-model="#sculpture-model" position="0 0 0" scale="1 1 1"></a-entity> -->
 
         </a-marker>
 
