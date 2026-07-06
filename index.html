@@ -25,11 +25,12 @@
         <!-- Definicja Twojego markera typu 'pattern' -->
         <a-marker type="pattern" url="marker.patt" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="10">
             
-            <!-- Kostka testowa -->
-            <a-box position="0 0.5 0" rotation="0 45 45" color="#4CC3D9" scale="0.5 0.5 0.5"></a-box>
-
-            <!-- Aby użyć swojego modelu GLTF zamiast kostki, odkomentuj linię poniżej: -->
-            <!-- <a-entity gltf-model="#sculpture-model" position="0 0 0" scale="1 1 1"></a-entity> -->
+     <a-entity 
+                gltf-model="#sculpture" 
+                scale="1 1 1" 
+                position="0 0 0"
+                rotation="0 0 0">
+            </a-entity>
 
         </a-marker>
 
