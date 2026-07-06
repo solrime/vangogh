@@ -16,13 +16,12 @@
 <a-scene
   embedded
   vr-mode-ui="enabled: false"
-  renderer="
-    antialias: true;
-    alpha: true;
-    precision: high;
-    colorManagement: true;
-    physicallyCorrectLights: true;
-  "
+renderer="
+antialias: true;
+precision: high;
+powerPreference: high-performance;
+sortObjects: true;
+"
   arjs="
     trackingMethod: best;
     sourceType: webcam;
