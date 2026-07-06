@@ -12,10 +12,23 @@
 <body style="margin: 0; overflow: hidden;">
 
     <!-- Scena AR zoptymalizowana pod kątem stabilności -->
-<a-scene 
-    embedded 
-    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; trackingMethod: best; canvasResizeInterval: 200;"
-    renderer="logarithmicDepthBuffer: true; precision: medium;">
+<a-scene
+  embedded
+  vr-mode-ui="enabled: false"
+  renderer="
+    antialias: true;
+    alpha: true;
+    precision: high;
+    colorManagement: true;
+    physicallyCorrectLights: true;
+  "
+  arjs="
+    trackingMethod: best;
+    sourceType: webcam;
+    detectionMode: mono_and_matrix;
+    matrixCodeType: 3x3;
+    debugUIEnabled: false;
+  ">
         
         <!-- Zarządzanie zasobami (ładowanie modelu 3D) -->
         <a-assets>
@@ -23,7 +36,13 @@
         </a-assets>
 
         <!-- Definicja Twojego markera typu 'pattern' -->
-        <a-marker type="pattern" url="marker.patt" smooth="true" smoothCount="10" smoothTolerance="0.01" smoothThreshold="10">
+      <a-marker
+    type="pattern"
+    url="marker.patt"
+    smooth="true"
+    smoothCount="15"
+    smoothTolerance="0.01"
+    smoothThreshold="5">
             
      <a-entity 
                 gltf-model="#sculpture-model" 
