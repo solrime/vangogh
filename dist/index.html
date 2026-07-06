@@ -3,51 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prosty AR - Rzeźba na Stałe</title>
+    <title>Stabilny AR - Rzeźba Raz na Zawsze</title>
     <!-- Biblioteka A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <!-- Biblioteka AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <script>
-        // Rejestrujemy niestandardowy komponent A-Frame
-        AFRAME.registerComponent('freeze-on-match', {
+        // Rejestrujemy niestandardowy komponent do obsługi logiki "pojaw się tylko raz"
+        AFRAME.registerComponent('freeze-on-first-sight', {
             init: function () {
-                var el = this.el; // To jest nasz <a-marker>
-                var sculpture = el.querySelector('#sculpture');
-                var scene = el.sceneEl;
-                var hasSpawned = false;
+                const marker = this.el;
+                const scene = document.querySelector('a-scene');
+                const model = document.querySelector('#sculpture');
+                let hasSpawned = false;
 
-                el.addEventListener('markerFound', () => {
-                    // Jeśli rzeźba już stoi w świecie, ignorujemy ponowne znalezienie markera
+                marker.addEventListener('markerFound', () => {
+                    // Jeśli rzeźba już stoi, olewamy kolejne wykrycia markera
                     if (hasSpawned) return; 
                     
                     hasSpawned = true;
 
-                    // Dajemy ułamek sekundy AR.js na poprawne wypozycjonowanie markera w przestrzeni kamery
-                    setTimeout(() => {
-                        // Pobieramy światową pozycję, rotację i skalę rzeźby w momencie znalezienia markera
-                        var worldPosition = new THREE.Vector3();
-                        var worldQuaternion = new THREE.Quaternion();
-                        var worldScale = new THREE.Vector3();
-                        
-                        sculpture.object3D.getWorldPosition(worldPosition);
-                        sculpture.object3D.getWorldQuaternion(worldQuaternion);
-                        sculpture.object3D.getWorldScale(worldScale);
+                    // Pobieramy aktualną pozycję i rotację markera w świecie rzeczywistym
+                    const worldPosition = new THREE.Vector3();
+                    marker.object3D.getWorldPosition(worldPosition);
 
-                        // Odczepiamy rzeźbę od markera i przenosimy ją bezpośrednio do głównej sceny
-                        scene.appendChild(sculpture);
+                    const worldQuaternion = new THREE.Quaternion();
+                    marker.object3D.getWorldQuaternion(worldQuaternion);
 
-                        // Ustawiamy rzeźbie pobrane współrzędne w "prawdziwym" świecie
-                        sculpture.object3D.position.copy(worldPosition);
-                        sculpture.object3D.quaternion.copy(worldQuaternion);
-                        sculpture.object3D.scale.copy(worldScale);
+                    // Przypisujemy te współrzędne do modelu rzeźby
+                    model.object3D.position.copy(worldPosition);
+                    model.object3D.quaternion.copy(worldQuaternion);
 
-                        console.log("Rzeźba postawiona na stałe. Marker zostaje wyłączony.");
-                        
-                        // Opcjonalnie: całkowicie usuwamy marker ze sceny, żeby nie marnować procesora na jego szukanie
-                        el.parentNode.removeChild(el);
-                    }, 200); // 200ms opóźnienia wystarczy na stabilizację pozycji
+                    // Czynimy model widocznym
+                    model.setAttribute('visible', true);
+
+                    // Opcjonalnie: odpinamy komponenty AR, żeby telefon nie marnował baterii na szukanie markera
+                    marker.removeAttribute('arjs-anchor');
+                    marker.removeAttribute('component-anchor');
+                    
+                    console.log("Rzeźba postawiona na stałe!");
                 });
             }
         });
@@ -58,24 +53,26 @@
     <!-- Scena AR -->
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         
-        <!-- Zarządzanie zasobami -->
+        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="sculpture-model" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Dodajemy nasz skrypt 'freeze-on-match' do markera -->
-        <a-marker type="pattern" url="marker.patt" freeze-on-match>
-            
-            <!-- Model 3D z przypisanym ID, żeby skrypt mógł go łatwo znaleźć -->
-            <a-entity 
-                id="sculpture"
-                gltf-model="#sculpture-model"
-                position="0 0 0" 
-                scale="1 1 1"
-                rotation="0 0 0">
-            </a-entity>
-
+        <!-- Definicja markera z przypisanym naszym skryptem freeze-on-first-sight -->
+        <a-marker type="pattern" url="marker.patt" freeze-on-first-sight>
+            <!-- Marker zostawiamy pusty lub jako punkt odniesienia, rzeźba żyje teraz niezależnie -->
         </a-marker>
+
+        <!-- Model rzeźby umieszczony bezpośrednio w scenie (nie w markerze) -->
+        <!-- Domyślnie jest ukryty (visible="false") i uaktywnia się dopiero po znalezieniu markera -->
+        <a-entity 
+            id="sculpture"
+            gltf-model="#sculpture-model"
+            position="0 0 0" 
+            scale="1 1 1"
+            rotation="0 0 0"
+            visible="false">
+        </a-entity>
 
         <!-- Kamera AR -->
         <a-entity camera></a-entity>
