@@ -12,7 +12,10 @@
 <body style="margin: 0; overflow: hidden;">
 
     <!-- Scena AR -->
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+<a-scene 
+    embedded 
+    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_matrix; matrixCodeType: 3x3; imageSmoothingEnabled: true; trackingMethod: best;"
+    gesture-detector>
         
         <!-- Zarządzanie zasobami (ładowanie modelu 3D) -->
         <a-assets>
