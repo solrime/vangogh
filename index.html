@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
     <title>Prosty AR - Rzeźba</title>
-    <!-- Biblioteka A-Frame -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <!-- Biblioteka AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-    <!-- Scena AR zoptymalizowana pod kątem stabilności -->
-<a-scene
+    <a-scene
   embedded
   vr-mode-ui="enabled: false"
 renderer="
@@ -30,21 +27,18 @@ sortObjects: true;
     debugUIEnabled: false;
   ">
         
-        <!-- Zarządzanie zasobami (ładowanie modelu 3D) -->
         <a-assets>
             <a-asset-item id="sculpture-model" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- Definicja Twojego markera typu 'pattern' -->
-      <a-marker
-    type="pattern"
-    url="marker.patt"
-    smooth="true"
-    smoothCount="7"
-    smoothTolerance="0.01"
-    smoothThreshold="10">
+        <a-marker
+          preset="hiro"
+          smooth="true"
+          smoothCount="7"
+          smoothTolerance="0.01"
+          smoothThreshold="10">
             
-     <a-entity 
+            <a-entity 
                 gltf-model="#sculpture-model" 
                 scale="1 1 1" 
                 position="0 0 0"
@@ -53,7 +47,6 @@ sortObjects: true;
 
         </a-marker>
 
-        <!-- Kamera AR -->
         <a-entity camera></a-entity>
 
     </a-scene>
