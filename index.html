@@ -33,17 +33,13 @@ logarithmicDepthBuffer: true; /* Pomaga w stabilizacji modelu przy obrotach */
             <a-asset-item id="sculpture-model" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <a-marker
-          preset="hiro"
-          smooth="false"> <a-entity 
-                gltf-model="#sculpture-model" 
-                scale="0.1 0.1 0.1" 
+        <a-marker preset="hiro" smooth="false">
+            <a-entity
+                gltf-model="#sculpture-model"
+                scale="0.1 0.1 0.1"
                 position="0 0 0"
-                rotation="0 0 0"
-                /* Jeśli model wydaje się za mały po wyłączeniu wygładzania,
-                   możesz spróbować go lekko powiększyć tutaj */>
+                rotation="0 0 0">
             </a-entity>
-
         </a-marker>
 
         <a-entity camera></a-entity>
