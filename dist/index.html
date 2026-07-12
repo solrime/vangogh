@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>QR Marker Based AR - Wiele Markerów</title>
-    <!-- Biblioteka A-Frame -->
+    <title>QR Marker Based AR - Multiple Hiro Markers</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <!-- Biblioteka AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
         html, body {
@@ -45,7 +43,7 @@
         }
 
         #watermark img {
-            height: 160px;
+            height: 80px;
             width: auto;
             opacity: 0.8;
         }
@@ -53,41 +51,37 @@
 </head>
 <body>
 
-    <!-- Kontener na znak wodny -->
     <div id="watermark">
         <img src="https://vangoghfestival.pl/wp-content/uploads/2026/01/cropped-3-4-2.webp" alt="Logo Van Gogh Festival">
     </div>
 
-    <!-- 
-        ZMIANA: Dodaliśmy 'maxDetectionRate: 60', aby kamera częściej szukała obiektów,
-        oraz przekazaliśmy silnikowi, że ma pozwolić na wyświetlanie więcej niż jednego obiektu.
-    -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; maxDetectionRate: 60;"
+        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
         vr-mode-ui="enabled: false">
         
-        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <!-- 
-            ZMIANA: W A-Frame, aby obsłużyć WIELE identycznych markerów w tym samym czasie, 
-            wystarczy zdefiniować ten sam marker kilkukrotnie lub pozwolić silnikowi 
-            na ich klonowanie (AR.js pod spodem automatycznie przypisze rzeźbę do każdego 
-            wykrytego wzorca Hiro, jeśli silnik dostanie wyższy detection rate).
-        -->
         <a-marker preset="hiro">
             <a-entity 
                 gltf-model="#rzeźba" 
                 position="0 0 0" 
-                scale="0.2 0.2 0.2"
+                scale="1 1 1"
                 rotation="0 0 0">
             </a-entity>
         </a-marker>
 
-        <!-- Kamera z naturalnym polem widzenia -->
+        <a-marker preset="hiro">
+            <a-entity 
+                gltf-model="#rzeźba" 
+                position="0 0 0" 
+                scale="1 1 1"
+                rotation="0 0 0">
+            </a-entity>
+        </a-marker>
+
         <a-entity camera></a-entity>
 
     </a-scene>
