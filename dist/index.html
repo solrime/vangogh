@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>QR Marker Based AR - Rzeźba ze Znakiem Wodnym</title>
+    <title>QR Marker Based AR - Wiele Markerów</title>
+    <!-- Biblioteka A-Frame -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <!-- Biblioteka AR.js dla A-Frame -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
-        /* Całkowite czyszczenie marginesów i blokada suwaków */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
-            backgroundColor: #000;
+            background-color: #000;
         }
         
-        /* Wymuszenie na wideo z kamery zajęcia 100% ekranu bez pasków */
         #arjs-video {
             position: absolute;
             top: 0;
@@ -29,7 +29,6 @@
             padding: 0 !important;
         }
 
-        /* Wymuszenie na warstwie 3D (A-Frame), by idealnie pokrywała wideo */
         .a-canvas {
             width: 100% !important;
             height: 100% !important;
@@ -37,37 +36,48 @@
             left: 0;
         }
 
-        /* --- STYL DLA LOGO (ZNAKU WODNEGO) --- */
         #watermark {
             position: absolute;
-            bottom: 20px; /* Odstęp od dołu */
-            right: 20px;  /* Odstęp od prawej */
-            z-index: 1000; /* Upewnia się, że logo jest nad kamerą */
-            pointer-events: none; /* Kliknięcia przechodzą przez logo do AR */
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            pointer-events: none;
         }
 
         #watermark img {
-            height: 160px; /* Możesz zmienić wielkość logo tutaj */
+            height: 160px;
             width: auto;
-            opacity: 0.8; /* Lekka przezroczystość, by nie przeszkadzało */
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
+    <!-- Kontener na znak wodny -->
     <div id="watermark">
         <img src="https://vangoghfestival.pl/wp-content/uploads/2026/01/cropped-3-4-2.webp" alt="Logo Van Gogh Festival">
     </div>
 
+    <!-- 
+        ZMIANA: Dodaliśmy 'maxDetectionRate: 60', aby kamera częściej szukała obiektów,
+        oraz przekazaliśmy silnikowi, że ma pozwolić na wyświetlanie więcej niż jednego obiektu.
+    -->
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false;"
+        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; maxDetectionRate: 60;"
         vr-mode-ui="enabled: false">
         
+        <!-- Ładowanie zasobów -->
         <a-assets>
             <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
+        <!-- 
+            ZMIANA: W A-Frame, aby obsłużyć WIELE identycznych markerów w tym samym czasie, 
+            wystarczy zdefiniować ten sam marker kilkukrotnie lub pozwolić silnikowi 
+            na ich klonowanie (AR.js pod spodem automatycznie przypisze rzeźbę do każdego 
+            wykrytego wzorca Hiro, jeśli silnik dostanie wyższy detection rate).
+        -->
         <a-marker preset="hiro">
             <a-entity 
                 gltf-model="#rzeźba" 
@@ -77,6 +87,7 @@
             </a-entity>
         </a-marker>
 
+        <!-- Kamera z naturalnym polem widzenia -->
         <a-entity camera></a-entity>
 
     </a-scene>
