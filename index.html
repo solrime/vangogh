@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>QR Marker Based AR - Multiple Hiro Markers</title>
+    <title>QR Marker Based AR - Wiele Markerów</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -34,6 +34,7 @@
             left: 0;
         }
 
+        /* STYL DLA LOGO (ZNAKU WODNEGO) */
         #watermark {
             position: absolute;
             bottom: 20px;
@@ -57,14 +58,14 @@
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        arjs="sourceType: webcam; trackingMethod: best; maxDetectionRate: 60; detectionMode: mono_and_matrix; debugUIEnabled: false;"
         vr-mode-ui="enabled: false">
         
         <a-assets>
             <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <a-marker preset="hiro">
+        <a-marker type="pattern" url="https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro">
             <a-entity 
                 gltf-model="#rzeźba" 
                 position="0 0 0" 
@@ -73,11 +74,11 @@
             </a-entity>
         </a-marker>
 
-        <a-marker preset="hiro">
+        <a-marker type="pattern" url="https://raw.githack.com/AR-js-org/AR.js/master/data/data/patt.hiro">
             <a-entity 
                 gltf-model="#rzeźba" 
                 position="0 0 0" 
-                scale="1 1 1"
+                scale="0.1 0.1 0.1"
                 rotation="0 0 0">
             </a-entity>
         </a-marker>
