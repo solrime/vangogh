@@ -1,87 +1,86 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>QR Marker Based AR - Rzeźba ze Znakiem Wodnym</title>
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-        }
-        
-        /* UWAGA: Usunięto agresywne wymuszenie stylów dla #arjs-video, 
-           ponieważ AR.js sam wylicza proporcje. Zostawiamy tylko zabezpieczenie pozycji. */
-        #arjs-video {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>QR Marker Based AR - Rzeźba ze Znakiem Wodnym</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        /* Całkowite czyszczenie marginesów i blokada suwaków */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            backgroundColor: #000;
+        }
+        
+        /* Wymuszenie na wideo z kamery zajęcia 100% ekranu bez pasków */
+        #arjs-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
 
-        #watermark {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;  
-            z-index: 1000; 
-            pointer-events: none; 
-        }
+        /* Wymuszenie na warstwie 3D (A-Frame), by idealnie pokrywała wideo */
+        .a-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            top: 0;
+            left: 0;
+        }
 
-        #watermark img {
-            height: 160px; 
-            width: auto;
-            opacity: 0.8; 
-        }
-    </style>
+        /* --- STYL DLA LOGO (ZNAKU WODNEGO) --- */
+        #watermark {
+            position: absolute;
+            bottom: 20px; /* Odstęp od dołu */
+            right: 20px;  /* Odstęp od prawej */
+            z-index: 1000; /* Upewnia się, że logo jest nad kamerą */
+            pointer-events: none; /* Kliknięcia przechodzą przez logo do AR */
+        }
+
+        #watermark img {
+            height: 160px; /* Możesz zmienić wielkość logo tutaj */
+            width: auto;
+            opacity: 0.8; /* Lekka przezroczystość, by nie przeszkadzało */
+        }
+    </style>
 </head>
 <body>
 
-    <div id="watermark">
-        <img src="https://vangoghfestival.pl/wp-content/uploads/2026/01/cropped-3-4-2.webp" alt="Logo Van Gogh Festival">
-    </div>
+    <div id="watermark">
+        <img src="https://vangoghfestival.pl/wp-content/uploads/2026/01/cropped-3-4-2.webp" alt="Logo Van Gogh Festival">
+    </div>
 
-    <a-scene 
-        embedded 
-        arjs="sourceType: webcam; 
-              trackingMethod: best; 
-              detectionMode: mono; 
-              sourceWidth: 1280; 
-              sourceHeight: 720; 
-              displayWidth: 1280; 
-              displayHeight: 720; 
-              debugUIEnabled: false; 
-              patternRatio: 0.90;"
-        vr-mode-ui="enabled: false">
-        
-        <a-assets>
-            <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
-        </a-assets>
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; trackingMethod: mono; debugUIEnabled: false; patternRatio: 0.90;"
+        vr-mode-ui="enabled: false">
+        
+        <a-assets>
+            <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
+        </a-assets>
 
-        <a-marker 
-            type="pattern" 
-            url="marker_(2).patt"
-            smooth="true"
-            smoothCount="10"
-            smoothTolerance="0.01"
-            smoothThreshold="5">
-            
-            <a-entity 
-                gltf-model="#rzeźba" 
-                position="0 0 0" 
-                scale="0.1 0.1 0.1"
-                rotation="0 0 0">
-            </a-entity>
-        </a-marker>
+<a-marker type="pattern" url="marker_(2).patt">
+            <a-entity 
+                gltf-model="#rzeźba" 
+                position="0 0 0" 
+                scale="0.1 0.1 0.1"
+                rotation="0 0 0">
+            </a-entity>
+        </a-marker>
 
-        <a-entity camera></a-entity>
+        <a-entity camera></a-entity>
 
-    </a-scene>
+    </a-scene>
 
 </body>
 </html>
+
