@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>QR Marker Based AR - Fix Pasa</title>
+    <title>QR Marker Based AR - Rzeźba ze Znakiem Wodnym</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -35,29 +35,30 @@
             height: 100% !important;
             top: 0;
             left: 0;
+        }
 
-          #logo-container {
+        /* --- STYL DLA LOGO (ZNAKU WODNEGO) --- */
+        #watermark {
             position: absolute;
             bottom: 20px; /* Odstęp od dołu */
             right: 20px;  /* Odstęp od prawej */
-            z-index: 1000; /* Upewnia się, że logo jest nad sceną AR */
-            pointer-events: none; /* Zapobiega interakcji z logo, przepuszcza kliknięcia */
+            z-index: 1000; /* Upewnia się, że logo jest nad kamerą */
+            pointer-events: none; /* Kliknięcia przechodzą przez logo do AR */
         }
 
-        #logo-container img {
-            max-width: 150px; /* Maksymalna szerokość logo */
-            height: auto;    /* Zachowanie proporcji */
-            display: block;  /* Usuwa domyślny margines pod obrazkiem */
-            /* Opcjonalnie: cień, by logo było lepiej widoczne */
-            filter: drop-shadow(0px 0px 5px rgba(0,0,0,0.5));
-        }
+        #watermark img {
+            height: 80px; /* Możesz zmienić wielkość logo tutaj */
+            width: auto;
+            opacity: 0.8; /* Lekka przezroczystość, by nie przeszkadzało */
         }
     </style>
 </head>
 <body>
-<div id="logo-container">
+
+    <div id="watermark">
         <img src="https://vangoghfestival.pl/wp-content/uploads/2026/01/cropped-3-4-2.webp" alt="Logo Van Gogh Festival">
     </div>
+
     <a-scene 
         embedded 
         arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false;"
