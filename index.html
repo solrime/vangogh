@@ -61,18 +61,18 @@
 
     <a-scene 
         embedded 
-        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false; patternRatio 0.90"
+        arjs="sourceType: webcam; trackingMethod: best; debugUIEnabled: false;"
         vr-mode-ui="enabled: false">
         
         <a-assets>
             <a-asset-item id="rzeźba" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <a-marker type="pattern" url="marker_(2).patt">
+        <a-marker preset="hiro">
             <a-entity 
                 gltf-model="#rzeźba" 
                 position="0 0 0" 
-                scale="0.1 0.1 0.1"
+                scale="1 1 1"
                 rotation="0 0 0">
             </a-entity>
         </a-marker>
