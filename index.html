@@ -4,30 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>Prosty AR - Rzeźba (Kotwica)</title>
+    <title>AR Rzeźba - Anchor</title>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <script>
-        AFRAME.registerComponent('marker-anchor', {
-            init: function () {
-                // Znajdź marker i model
-                this.marker = document.querySelector('a-marker');
-                this.model = document.querySelector('#anchored-model');
-            },
-            tick: function () {
-                // W każdej klatce, jeśli marker jest wykryty,
-                // zaktualizuj pozycję i rotację modelu
-                if (this.marker && this.marker.object3D.visible && this.model) {
-                    this.model.setAttribute('position', this.marker.getAttribute('position'));
-                    this.model.setAttribute('rotation', this.marker.getAttribute('rotation'));
-                    this.model.setAttribute('visible', 'true');
-                } else if (this.model) {
-                    this.model.setAttribute('visible', 'false');
-                }
-            }
-        });
-    </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -39,6 +18,7 @@ antialias: true;
 precision: high;
 powerPreference: high-performance;
 sortObjects: true;
+logarithmicDepthBuffer: true; /* Pomaga w stabilizacji modelu przy obrotach */
 "
   arjs="
     trackingMethod: best;
@@ -46,28 +26,21 @@ sortObjects: true;
     detectionMode: mono_and_matrix;
     matrixCodeType: 3x3;
     debugUIEnabled: false;
-  "
-  marker-anchor>
+    labelingMode: black_region; /* Poprawia detekcję czarnej ramki markera */
+  ">
         
         <a-assets>
             <a-asset-item id="sculpture-model" src="https://cdn.tinyglb.com/models/9f265ca841134c088ae3333ee0143afd.glb"></a-asset-item>
         </a-assets>
 
-        <a-marker
-          preset="hiro"
-          smooth="true"
-          smoothCount="7"
-          smoothTolerance="0.01"
-          smoothThreshold="10">
-            </a-marker>
-
-        <a-entity 
-            id="anchored-model"
-            gltf-model="#sculpture-model" 
-            scale="0.1 0.1 0.1" 
-            position="0 0 0" 
-            rotation="0 0 0"
-            visible="false"> </a-entity>
+        <a-marker preset="hiro" smooth="false">
+            <a-entity
+                gltf-model="#sculpture-model"
+                scale="0.1 0.1 0.1"
+                position="0 0 0"
+                rotation="0 0 0">
+            </a-entity>
+        </a-marker>
 
         <a-entity camera></a-entity>
 
