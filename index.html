@@ -15,33 +15,28 @@
             overflow: hidden;
             background-color: #000;
         }
+        
+        /* UWAGA: Usunięto agresywne wymuszenie stylów dla #arjs-video, 
+           ponieważ AR.js sam wylicza proporcje. Zostawiamy tylko zabezpieczenie pozycji. */
         #arjs-video {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            margin: 0 !important;
-            padding: 0 !important;
+            z-index: -1;
         }
-        .a-canvas {
-            width: 100% !important;
-            height: 100% !important;
-            top: 0;
-            left: 0;
-        }
+
         #watermark {
             position: absolute;
             bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            pointer-events: none;
+            right: 20px;  
+            z-index: 1000; 
+            pointer-events: none; 
         }
+
         #watermark img {
-            height: 160px;
+            height: 160px; 
             width: auto;
-            opacity: 0.8;
+            opacity: 0.8; 
         }
     </style>
 </head>
@@ -55,15 +50,13 @@
         embedded 
         arjs="sourceType: webcam; 
               trackingMethod: best; 
-              detectionMode: mono_matrix; 
-              matrixCodeType: 3x3;
+              detectionMode: mono; 
               sourceWidth: 1280; 
               sourceHeight: 720; 
               displayWidth: 1280; 
-              displayHeight: 720;
-              canvasWidth: 1280;
-              canvasHeight: 720;
-              debugUIEnabled: false;"
+              displayHeight: 720; 
+              debugUIEnabled: false; 
+              patternRatio: 0.90;"
         vr-mode-ui="enabled: false">
         
         <a-assets>
